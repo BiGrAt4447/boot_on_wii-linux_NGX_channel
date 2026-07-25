@@ -1,4 +1,3 @@
-# Makefile (adjust LIBOGC path)
 LIBOGC = /usr/local/libogc
 CC = powerpc-eabi-gcc
 CFLAGS = -O2 -m32 -mcpu=750 -meabi -I$(LIBOGC)/include
