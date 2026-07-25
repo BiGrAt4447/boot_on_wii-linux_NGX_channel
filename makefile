@@ -1,14 +1,20 @@
-# gumboot startup pseudo script (POSIX shell style)
-NEXTFLAG="/boot/nextboot"
-if [ -f "$NEXTFLAG" ]; then
-  val=$(cat "$NEXTFLAG" 2>/dev/null)
-  if [ "$val" = "linux" ]; then
-    rm -f "$NEXTFLAG"
-    # Boot the Wii-Linux NGX entry (adjust to your bootloader command)
-    boot_entry "Wii-Linux NGX"
-    exit 0
-  fi
-fi
+# Makefile (adjust LIBOGC path)
+LIBOGC = /usr/local/libogc
+CC = powerpc-eabi-gcc
+CFLAGS = -O2 -m32 -mcpu=750 -meabi -I$(LIBOGC)/include
+LDFLAGS = -L$(LIBOGC)/lib -logc -lfat
+OBJS = forwarder.o
 
-# otherwise show normal gumboot menu
-show_gumboot_menu
+all: forwarder.dol
+
+forwarder.o: forwarder.c
+    $(CC) $(CFLAGS) -c forwarder.c -o forwarder.o
+
+forwarder.elf: $(OBJS)
+    $(CC) $(CFLAGS) -o forwarder.elf $(OBJS) $(LDFLAGS)
+
+forwarder.dol: forwarder.elf
+    $(LIBOGC)/bin/elf2dol forwarder.elf forwarder.dol
+
+clean:
+    rm -f *.o forwarder.elf forwarder.dol
